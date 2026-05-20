@@ -1,0 +1,4 @@
+# セッション要約 hook (Claude Code Stop イベント) の設定
+# gs-config コマンドで ON/OFF をトグルできる
+
+ENABLED=false

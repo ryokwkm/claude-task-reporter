@@ -8,7 +8,7 @@ SCRIPT_DIR=$(dirname "$0")
 if [ -f "${SCRIPT_DIR}/session_summary.conf" ]; then
     . "${SCRIPT_DIR}/session_summary.conf"
 fi
-if [ "${ENABLED:-true}" != "true" ]; then
+if [ "${CS_ENABLED:-true}" != "true" ]; then
     exit 0
 fi
 
@@ -61,8 +61,69 @@ else
     echo "[session_summary] デスクトップ通知の表示に失敗しました" >&2
 fi
 
-say "$SUMMARY_RESULT" &
-echo "[session_summary] 音声読み上げをバックグラウンドで開始しました" >&2
+# ===== 音声出力 =====
+# CS_VOICE_MODE に応じて、ずんだもん / say を切り替える
+# - auto:     ENGINE 疎通 OK ならずんだもん、NG なら say
+# - say:      常に say
+# - zundamon: 常にずんだもん（ENGINE 未起動なら読み上げスキップ）
+CS_VOICE_MODE="${CS_VOICE_MODE:-auto}"
+VOICEVOX_URL="${VOICEVOX_URL:-http://localhost:50021}"
+VOICEVOX_SPEAKER="${VOICEVOX_SPEAKER:-3}"
+VOICEVOX_SYNTH_TIMEOUT="${VOICEVOX_SYNTH_TIMEOUT:-10}"
+
+voicevox_alive() {
+    local code
+    code=$(curl -s -o /dev/null --max-time 1 -w "%{http_code}" "${VOICEVOX_URL}/version" 2>/dev/null)
+    [ "$code" = "200" ]
+}
+
+speak_with_zundamon() {
+    local text="$1"
+    local wav="/tmp/claude_zunda_$$.wav"
+    local query
+    query=$(curl -s --max-time "$VOICEVOX_SYNTH_TIMEOUT" \
+        -X POST "${VOICEVOX_URL}/audio_query?speaker=${VOICEVOX_SPEAKER}" \
+        --get --data-urlencode "text=${text}") || return 1
+    [ -z "$query" ] && return 1
+
+    curl -s --max-time "$VOICEVOX_SYNTH_TIMEOUT" \
+        -H "Content-Type: application/json" \
+        -X POST "${VOICEVOX_URL}/synthesis?speaker=${VOICEVOX_SPEAKER}" \
+        -d "$query" -o "$wav" || return 1
+    [ ! -s "$wav" ] && return 1
+
+    afplay "$wav"
+    rm -f "$wav"
+}
+
+speak() {
+    local text="$1"
+    case "$CS_VOICE_MODE" in
+        say)
+            say "$text" &
+            echo "[session_summary] say で音声読み上げを開始しました" >&2
+            ;;
+        zundamon)
+            if voicevox_alive; then
+                ( speak_with_zundamon "$text" ) &
+                echo "[session_summary] ずんだもん音声でバックグラウンド再生を開始しました" >&2
+            else
+                echo "[session_summary] VOICEVOX ENGINE 未起動。zundamon モードのため読み上げをスキップします" >&2
+            fi
+            ;;
+        auto|*)
+            if voicevox_alive; then
+                ( speak_with_zundamon "$text" || say "$text" ) &
+                echo "[session_summary] ずんだもん音声でバックグラウンド再生を開始しました" >&2
+            else
+                say "$text" &
+                echo "[session_summary] VOICEVOX ENGINE 未起動。say にフォールバックしました" >&2
+            fi
+            ;;
+    esac
+}
+
+speak "$SUMMARY_RESULT"
 
 if [ $((RANDOM % 100)) -lt 3 ]; then
     find /tmp -name "claude_summary_*.txt" -mtime +1 -delete 2>/dev/null

@@ -1,4 +1,17 @@
-# セッション要約 hook (Claude Code Stop イベント) の設定
-# gs-config コマンドで ON/OFF をトグルできる
+# Claude Summary (claude-task-reporter) の設定
+# csconfig コマンドで ON/OFF をトグル、csstatus で状態確認
 
-ENABLED=false
+CS_ENABLED=false
+
+# ====== VOICEVOX (ずんだもん音声) 設定 ======
+# CS_VOICE_MODE: auto | say | zundamon
+#   auto:     ENGINE 起動中なら ずんだもん、停止中なら say にフォールバック
+#   say:      常に say (macOS 標準) を使用
+#   zundamon: 常にずんだもん（ENGINE 未起動時は読み上げスキップ）
+CS_VOICE_MODE=auto
+
+VOICEVOX_IMAGE=voicevox/voicevox_engine:cpu-latest
+VOICEVOX_CONTAINER=voicevox_engine
+VOICEVOX_URL=http://localhost:50021
+VOICEVOX_SPEAKER=3
+VOICEVOX_SYNTH_TIMEOUT=10

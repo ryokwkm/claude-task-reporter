@@ -1,5 +1,5 @@
 #!/bin/bash
-# タスク完了通知 hook の現在の ON/OFF 状態を表示する
+# Claude Summary (claude-task-reporter) の現在の ON/OFF 状態を表示する
 
 set -eu
 
@@ -10,4 +10,4 @@ if [ ! -f "$CONF" ]; then
     exit 1
 fi
 
-grep "^ENABLED=" "$CONF"
+grep "^CS_ENABLED=" "$CONF"

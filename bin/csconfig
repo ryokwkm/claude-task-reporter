@@ -1,0 +1,22 @@
+#!/bin/bash
+# Claude Summary (claude-task-reporter) の ON/OFF をトグルする
+
+set -eu
+
+CONF="$HOME/.claude/hooks/claude-task-reporter/session_summary.conf"
+
+if [ ! -f "$CONF" ]; then
+    echo "設定ファイルが見つかりません: $CONF" >&2
+    exit 1
+fi
+
+if grep -q "^CS_ENABLED=true" "$CONF"; then
+    sed -i "" "s/^CS_ENABLED=true/CS_ENABLED=false/" "$CONF"
+    echo "Claude Summary: OFF"
+elif grep -q "^CS_ENABLED=false" "$CONF"; then
+    sed -i "" "s/^CS_ENABLED=false/CS_ENABLED=true/" "$CONF"
+    echo "Claude Summary: ON"
+else
+    echo "CS_ENABLED の値が true/false ではありません: $CONF" >&2
+    exit 1
+fi

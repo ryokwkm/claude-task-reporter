@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/claude-task-reporter/session_summary.sh",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}

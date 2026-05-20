@@ -1,0 +1,13 @@
+#!/bin/bash
+# タスク完了通知 hook の現在の ON/OFF 状態を表示する
+
+set -eu
+
+CONF="$HOME/.claude/hooks/claude-task-reporter/session_summary.conf"
+
+if [ ! -f "$CONF" ]; then
+    echo "設定ファイルが見つかりません: $CONF" >&2
+    exit 1
+fi
+
+grep "^ENABLED=" "$CONF"

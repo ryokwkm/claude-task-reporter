@@ -12,12 +12,6 @@ if [ "${ENABLED:-true}" != "true" ]; then
     exit 0
 fi
 
-# 再帰防止: この hook が claude CLI を呼ぶと、その子セッション終了で Stop hook が再発火するため
-if [ "${CLAUDE_SUMMARY_HOOK_RUNNING:-}" = "1" ]; then
-    exit 0
-fi
-export CLAUDE_SUMMARY_HOOK_RUNNING=1
-
 # Claude Code から stdin で渡される JSON を受け取る（shに専用の組み込み変数はなく、cat がイディオム）
 ARGS=$(cat)
 
@@ -45,7 +39,7 @@ ${SUMMARY_INPUT}"
 
 echo "[session_summary] 作業要約を生成中 (stop_reason: ${STOP_REASON})..." >&2
 
-SUMMARY_RESULT=$(claude -p --model claude-haiku-4-5 "$FULL_PROMPT" \
+SUMMARY_RESULT=$(claude -p --setting-sources "" --model claude-haiku-4-5 "$FULL_PROMPT" \
     2>/tmp/session_summary_error.log)
 
 EXIT_CODE=$?

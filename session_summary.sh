@@ -12,6 +12,14 @@ if [ "${CS_ENABLED:-true}" != "true" ]; then
     exit 0
 fi
 
+AUDIO_PID=""
+
+cleanup() {
+    [ -n "$AUDIO_PID" ] && kill "$AUDIO_PID" 2>/dev/null
+    exit 0
+}
+trap cleanup INT TERM
+
 # Claude Code から stdin で渡される JSON を受け取る（shに専用の組み込み変数はなく、cat がイディオム）
 ARGS=$(cat)
 
@@ -92,7 +100,10 @@ speak_with_zundamon() {
         -d "$query" -o "$wav" || return 1
     [ ! -s "$wav" ] && return 1
 
-    afplay "$wav"
+    afplay "$wav" &
+    AUDIO_PID=$!
+    wait $AUDIO_PID
+    AUDIO_PID=""
     rm -f "$wav"
 }
 
@@ -101,7 +112,10 @@ speak() {
     case "$CS_VOICE_MODE" in
         say)
             echo "[session_summary] say で音声読み上げ..." >&2
-            say "$text"
+            say "$text" &
+            AUDIO_PID=$!
+            wait $AUDIO_PID
+            AUDIO_PID=""
             ;;
         zundamon)
             if voicevox_alive; then
@@ -114,10 +128,18 @@ speak() {
         auto|*)
             if voicevox_alive; then
                 echo "[session_summary] ずんだもん音声で再生..." >&2
-                speak_with_zundamon "$text" || say "$text"
+                speak_with_zundamon "$text" || {
+                    say "$text" &
+                    AUDIO_PID=$!
+                    wait $AUDIO_PID
+                    AUDIO_PID=""
+                }
             else
                 echo "[session_summary] VOICEVOX ENGINE 未起動。say にフォールバックします" >&2
-                say "$text"
+                say "$text" &
+                AUDIO_PID=$!
+                wait $AUDIO_PID
+                AUDIO_PID=""
             fi
             ;;
     esac

@@ -1,6 +1,6 @@
 # claude-task-reporter
 
-Claude Code がタスクを完了したタイミングで、作業内容を Haiku で要約し、macOS のデスクトップ通知と音声読み上げで報告する Stop フック。
+Claude Code がタスクを完了したタイミングで、セッションのトランスクリプトを `claude-haiku` で要約し、macOS のデスクトップ通知と音声読み上げで報告する Stop フック。
 
 音声読み上げは、VOICEVOX (ずんだもん) が利用可能であればそちらを優先し、未起動時は macOS 標準の `say` にフォールバックする。
 
@@ -28,12 +28,6 @@ Claude Code がタスクを完了したタイミングで、作業内容を Haik
 git clone git@github.com:ryokwkm/claude-task-reporter.git ~/.claude/hooks/claude-task-reporter
 ```
 
-または既存リポジトリの submodule として追加：
-
-```bash
-git submodule add git@github.com:ryokwkm/claude-task-reporter.git path/to/claude-task-reporter
-```
-
 ### Step 2. settings.json に hook を登録
 
 `~/.claude/settings.json` の `hooks` に以下を追加（`settings.json.example` 参照）：
@@ -41,7 +35,7 @@ git submodule add git@github.com:ryokwkm/claude-task-reporter.git path/to/claude
 ```json
 {
   "hooks": {
-    "SessionStart": [
+    "UserPromptSubmit": [
       {
         "hooks": [
           {
@@ -106,7 +100,7 @@ export PATH="$HOME/.claude/hooks/claude-task-reporter/bin:$PATH"
 | `say` | 常に `say` を使用 |
 | `zundamon` | 常にずんだもん。ENGINE 未起動時は読み上げをスキップ |
 
-SessionStart hook (`voicevox_sync.sh`) が `CS_ENABLED` の値を見て VOICEVOX コンテナの起動／停止を自動制御する:
+UserPromptSubmit hook (`voicevox_sync.sh`) が `CS_ENABLED` の値を見て VOICEVOX コンテナの起動／停止を自動制御する:
 
 - `CS_ENABLED=true`  → コンテナが未起動なら `docker run` で起動
 - `CS_ENABLED=false` → コンテナが起動中なら `docker stop` で停止
@@ -115,11 +109,3 @@ SessionStart hook (`voicevox_sync.sh`) が `CS_ENABLED` の値を見て VOICEVOX
 
 クレジット表記: 本機能は [VOICEVOX:ずんだもん] を利用している。
 
----
-
-## 動作概要
-
-- Claude Code の Stop イベント（1つの指示への応答が完了したとき）に発火
-- セッションのトランスクリプトを `claude-haiku` で要約
-- macOS のデスクトップ通知（`osascript`）と音声読み上げで通知
-- SessionStart イベントで `CS_ENABLED` 設定に応じて VOICEVOX コンテナを自動起動／停止

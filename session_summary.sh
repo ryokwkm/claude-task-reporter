@@ -47,7 +47,7 @@ ${SUMMARY_INPUT}"
 
 echo "[session_summary] 作業要約を生成中 (stop_reason: ${STOP_REASON})..." >&2
 
-SUMMARY_RESULT=$(claude -p --setting-sources "" --model claude-haiku-4-5 "$FULL_PROMPT" \
+SUMMARY_RESULT=$(claude -p --setting-sources "" --model haiku "$FULL_PROMPT" \
     2>/tmp/session_summary_error.log)
 
 EXIT_CODE=$?

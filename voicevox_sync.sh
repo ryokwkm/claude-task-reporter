@@ -1,13 +1,13 @@
 #!/bin/bash
 # voicevox_sync.sh
-# Claude Code の SessionStart イベントで呼び出され、
+# Claude Code の UserPromptSubmit イベントで呼び出され、
 # session_summary.conf の CS_ENABLED 設定と VOICEVOX コンテナの起動状態を同期する
 #
 # - CS_ENABLED=true  かつ コンテナ停止中 → docker run でコンテナを起動
 # - CS_ENABLED=false かつ コンテナ起動中 → docker stop でコンテナを停止
 # - 状態が一致していれば何もしない
 #
-# SessionStart hook を待たせないため、self-fork でバックグラウンド実行する
+# UserPromptSubmit hook を待たせないため、self-fork でバックグラウンド実行する
 
 # self-fork: 親プロセスは即座に終了し、子プロセスで実処理を継続
 if [ -z "${VOICEVOX_SYNC_FORKED:-}" ]; then

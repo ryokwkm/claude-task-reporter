@@ -3,6 +3,12 @@
 
 CS_ENABLED=true
 
+# ====== LLM プロバイダー設定 ======
+# CS_LLM_PROVIDER: claude | gemini
+#   claude: claude-haiku を使用 (デフォルト)
+#   gemini: gemini-cli を使用
+CS_LLM_PROVIDER=claude
+
 # ====== VOICEVOX (ずんだもん音声) 設定 ======
 # CS_VOICE_MODE: auto | say | zundamon
 #   auto:     ENGINE 起動中なら ずんだもん、停止中なら say にフォールバック

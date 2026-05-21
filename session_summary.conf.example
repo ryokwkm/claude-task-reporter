@@ -1,7 +1,7 @@
 # Claude Summary (claude-task-reporter) の設定
 # csconfig コマンドで ON/OFF をトグル、csstatus で状態確認
 
-CS_ENABLED=false
+CS_ENABLED=true
 
 # ====== VOICEVOX (ずんだもん音声) 設定 ======
 # CS_VOICE_MODE: auto | say | zundamon

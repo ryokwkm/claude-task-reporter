@@ -4,49 +4,25 @@ Claude Code がタスクを完了したタイミングで、作業内容を Haik
 
 音声読み上げは、VOICEVOX (ずんだもん) が利用可能であればそちらを優先し、未起動時は macOS 標準の `say` にフォールバックする。
 
-## 動作概要
+---
 
-- Claude Code の Stop イベント（1つの指示への応答が完了したとき）に発火
-- セッションのトランスクリプトを `claude-haiku` で要約
-- macOS のデスクトップ通知（`osascript`）と音声読み上げで通知
-- SessionStart イベントで `CS_ENABLED` 設定に応じて VOICEVOX コンテナを自動起動／停止
+## 動作要件
 
-## 初期設定
+**セットアップ前に、以下がすべて揃っていることを確認してください。**
 
-リポジトリを `~/.claude/hooks/claude-task-reporter/` に配置済みの前提です。
-
-### Step 1. 設定ファイルを作成（必須）
-
-`.example` をコピーして `session_summary.conf` を作る:
-
-```bash
-cp ~/.claude/hooks/claude-task-reporter/session_summary.conf.example \
-   ~/.claude/hooks/claude-task-reporter/session_summary.conf
-```
-
-ファイル内の `CS_ENABLED=true` に書き換えると有効化される。
-
-### Step 2. PATH を通す（任意）
-
-設定の ON/OFF や状態確認を1コマンドで行いたい場合は、`bin/` を PATH に追加する:
-
-```bash
-export PATH="$HOME/.claude/hooks/claude-task-reporter/bin:$PATH"
-```
-
-`~/.zshrc` などに追記すると永続化される。
-
-| コマンド | 説明 |
+| 要件 | インストール方法 |
 |---|---|
-| `csconfig` | ON/OFF をトグル |
-| `csstatus` | 現在の状態を表示 |
-| `csedit` | 設定ファイルを vi で開く |
+| macOS | `osascript`, `say`, `afplay` を使用するため macOS 必須 |
+| [Claude Code CLI](https://claude.ai/code) | `npm install -g @anthropic-ai/claude-code` |
+| `jq` | `brew install jq` |
+| `curl` | macOS 標準搭載（通常インストール不要） |
+| Docker | [Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/) ※ VOICEVOX 連携を使う場合のみ |
 
 ---
 
 ## セットアップ（初回のみ）
 
-### リポジトリのクローン
+### Step 1. リポジトリをクローン
 
 ```bash
 git clone git@github.com:ryokwkm/claude-task-reporter.git ~/.claude/hooks/claude-task-reporter
@@ -58,7 +34,7 @@ git clone git@github.com:ryokwkm/claude-task-reporter.git ~/.claude/hooks/claude
 git submodule add git@github.com:ryokwkm/claude-task-reporter.git path/to/claude-task-reporter
 ```
 
-### settings.json に hook を登録
+### Step 2. settings.json に hook を登録
 
 `~/.claude/settings.json` の `hooks` に以下を追加（`settings.json.example` 参照）：
 
@@ -91,6 +67,35 @@ git submodule add git@github.com:ryokwkm/claude-task-reporter.git path/to/claude
 }
 ```
 
+### Step 3. 設定ファイルを作成（必須）
+
+`.example` をコピーして `session_summary.conf` を作る:
+
+```bash
+cp ~/.claude/hooks/claude-task-reporter/session_summary.conf.example \
+   ~/.claude/hooks/claude-task-reporter/session_summary.conf
+```
+
+デフォルトで `CS_ENABLED=true`（有効）になっている。無効にしたい場合は `CS_ENABLED=false` に書き換える。
+
+### Step 4. PATH を通す（任意）
+
+設定の ON/OFF や状態確認を1コマンドで行いたい場合は、`bin/` を PATH に追加する:
+
+```bash
+export PATH="$HOME/.claude/hooks/claude-task-reporter/bin:$PATH"
+```
+
+`~/.zshrc` などに追記すると永続化される。
+
+| コマンド | 説明 |
+|---|---|
+| `csconfig` | ON/OFF をトグル |
+| `csstatus` | 現在の状態を表示 |
+| `csedit` | 設定ファイルを vi で開く |
+
+---
+
 ## VOICEVOX (ずんだもん) 連携
 
 `session_summary.conf` の `CS_VOICE_MODE` で音声出力を切り替えられる:
@@ -110,10 +115,11 @@ SessionStart hook (`voicevox_sync.sh`) が `CS_ENABLED` の値を見て VOICEVOX
 
 クレジット表記: 本機能は [VOICEVOX:ずんだもん] を利用している。
 
-## 動作要件
+---
 
-- macOS（`osascript`, `say`, `afplay` を使用）
-- [Claude Code CLI](https://claude.ai/code) がインストール済みであること
-- `jq` コマンド
-- `curl` コマンド
-- Docker (VOICEVOX 連携を使う場合のみ)
+## 動作概要
+
+- Claude Code の Stop イベント（1つの指示への応答が完了したとき）に発火
+- セッションのトランスクリプトを `claude-haiku` で要約
+- macOS のデスクトップ通知（`osascript`）と音声読み上げで通知
+- SessionStart イベントで `CS_ENABLED` 設定に応じて VOICEVOX コンテナを自動起動／停止

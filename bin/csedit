@@ -1,0 +1,13 @@
+#!/bin/bash
+# Claude Summary (claude-task-reporter) の設定ファイルを編集する
+
+set -eu
+
+CONF="$HOME/.claude/hooks/claude-task-reporter/session_summary.conf"
+
+if [ ! -f "$CONF" ]; then
+    echo "設定ファイルが見つかりません: $CONF" >&2
+    exit 1
+fi
+
+vi "$CONF"

@@ -100,24 +100,24 @@ speak() {
     local text="$1"
     case "$CS_VOICE_MODE" in
         say)
-            say "$text" &
-            echo "[session_summary] say で音声読み上げを開始しました" >&2
+            echo "[session_summary] say で音声読み上げ..." >&2
+            say "$text"
             ;;
         zundamon)
             if voicevox_alive; then
-                ( speak_with_zundamon "$text" ) &
-                echo "[session_summary] ずんだもん音声でバックグラウンド再生を開始しました" >&2
+                echo "[session_summary] ずんだもん音声で再生..." >&2
+                speak_with_zundamon "$text"
             else
                 echo "[session_summary] VOICEVOX ENGINE 未起動。zundamon モードのため読み上げをスキップします" >&2
             fi
             ;;
         auto|*)
             if voicevox_alive; then
-                ( speak_with_zundamon "$text" || say "$text" ) &
-                echo "[session_summary] ずんだもん音声でバックグラウンド再生を開始しました" >&2
+                echo "[session_summary] ずんだもん音声で再生..." >&2
+                speak_with_zundamon "$text" || say "$text"
             else
-                say "$text" &
-                echo "[session_summary] VOICEVOX ENGINE 未起動。say にフォールバックしました" >&2
+                echo "[session_summary] VOICEVOX ENGINE 未起動。say にフォールバックします" >&2
+                say "$text"
             fi
             ;;
     esac

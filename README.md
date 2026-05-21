@@ -11,9 +11,42 @@ Claude Code がタスクを完了したタイミングで、作業内容を Haik
 - macOS のデスクトップ通知（`osascript`）と音声読み上げで通知
 - SessionStart イベントで `CS_ENABLED` 設定に応じて VOICEVOX コンテナを自動起動／停止
 
-## インストール
+## 初期設定
 
-### 1. リポジトリをクローン
+リポジトリを `~/.claude/hooks/claude-task-reporter/` に配置済みの前提です。
+
+### Step 1. 設定ファイルを作成（必須）
+
+`.example` をコピーして `session_summary.conf` を作る:
+
+```bash
+cp ~/.claude/hooks/claude-task-reporter/session_summary.conf.example \
+   ~/.claude/hooks/claude-task-reporter/session_summary.conf
+```
+
+ファイル内の `CS_ENABLED=true` に書き換えると有効化される。
+
+### Step 2. PATH を通す（任意）
+
+設定の ON/OFF や状態確認を1コマンドで行いたい場合は、`bin/` を PATH に追加する:
+
+```bash
+export PATH="$HOME/.claude/hooks/claude-task-reporter/bin:$PATH"
+```
+
+`~/.zshrc` などに追記すると永続化される。
+
+| コマンド | 説明 |
+|---|---|
+| `csconfig` | ON/OFF をトグル |
+| `csstatus` | 現在の状態を表示 |
+| `csedit` | 設定ファイルを vi で開く |
+
+---
+
+## セットアップ（初回のみ）
+
+### リポジトリのクローン
 
 ```bash
 git clone git@github.com:ryokwkm/claude-task-reporter.git ~/.claude/hooks/claude-task-reporter
@@ -25,16 +58,7 @@ git clone git@github.com:ryokwkm/claude-task-reporter.git ~/.claude/hooks/claude
 git submodule add git@github.com:ryokwkm/claude-task-reporter.git path/to/claude-task-reporter
 ```
 
-### 2. 設定ファイルを作成
-
-```bash
-cp ~/.claude/hooks/claude-task-reporter/session_summary.conf.example \
-   ~/.claude/hooks/claude-task-reporter/session_summary.conf
-```
-
-必要に応じて `CS_ENABLED=true` に変更する。
-
-### 3. settings.json に hook を登録
+### settings.json に hook を登録
 
 `~/.claude/settings.json` の `hooks` に以下を追加（`settings.json.example` 参照）：
 
@@ -66,26 +90,6 @@ cp ~/.claude/hooks/claude-task-reporter/session_summary.conf.example \
   }
 }
 ```
-
-## 設定
-
-`session_summary.conf` で ON/OFF を切り替えられる：
-
-```bash
-CS_ENABLED=true   # 有効
-CS_ENABLED=false  # 無効
-```
-
-`bin/` 以下のスクリプトを PATH に追加することで、コマンドから操作できる：
-
-```bash
-export PATH="$HOME/.claude/hooks/claude-task-reporter/bin:$PATH"
-```
-
-| コマンド | 説明 |
-|---|---|
-| `csconfig` | ON/OFF をトグル |
-| `csstatus` | 現在の状態を表示 |
 
 ## VOICEVOX (ずんだもん) 連携
 

@@ -4,9 +4,9 @@
 CS_ENABLED=true
 
 # ====== LLM プロバイダー設定 ======
-# CS_LLM_PROVIDER: claude | gemini
+# CS_LLM_PROVIDER: claude | agy
 #   claude: claude-haiku を使用 (デフォルト)
-#   gemini: gemini-cli を使用
+#   agy: agy コマンド (Gemini) を使用
 CS_LLM_PROVIDER=claude
 
 # ====== VOICEVOX (ずんだもん音声) 設定 ======
@@ -19,5 +19,5 @@ CS_VOICE_MODE=auto
 VOICEVOX_IMAGE=voicevox/voicevox_engine:cpu-latest
 VOICEVOX_CONTAINER=voicevox_engine
 VOICEVOX_URL=http://localhost:50021
-VOICEVOX_SPEAKER=2
+VOICEVOX_SPEAKER=3
 VOICEVOX_SYNTH_TIMEOUT=15

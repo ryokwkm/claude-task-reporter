@@ -49,8 +49,8 @@ ${SUMMARY_INPUT}"
 
 echo "[session_summary] 作業要約を生成中 (stop_reason: ${STOP_REASON}, provider: ${CS_LLM_PROVIDER})..." >&2
 
-if [ "$CS_LLM_PROVIDER" = "gemini" ]; then
-    SUMMARY_RESULT=$(GEMINI_CLI_TRUST_WORKSPACE=true gemini -p "$FULL_PROMPT" \
+if [ "$CS_LLM_PROVIDER" = "agy" ]; then
+    SUMMARY_RESULT=$(agy -p "$FULL_PROMPT" \
         2>/tmp/session_summary_error.log)
 else
     SUMMARY_RESULT=$(claude -p --setting-sources "" --model haiku "$FULL_PROMPT" \
